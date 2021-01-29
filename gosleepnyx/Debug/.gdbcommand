@@ -1,0 +1,5 @@
+set sysroot C:/tizen-studio/platforms/tizen-5.5/wearable/rootstraps/wearable-5.5-emulator.core
+set debug-file-directory C:/tizen-studio/platforms/tizen-5.5/wearable/rootstraps/wearable-5.5-emulator.core/usr/lib/debug
+set solib-search-path C:/Users/Donghan Park/workspace/gosleepnyx/Debug
+dir C:/tizen-studio/platforms/tizen-5.5/wearable/rootstraps/wearable-5.5-emulator.core/usr/src/debug
+sharedlibrary

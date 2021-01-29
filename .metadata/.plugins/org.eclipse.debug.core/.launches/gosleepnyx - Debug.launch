@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.tizen.nativecore.launch.TizenLaunchConfigurationType">
+<booleanAttribute key="org.eclipse.cdt.dsf.gdb.AUTO_SOLIB" value="true"/>
+<stringAttribute key="org.eclipse.cdt.dsf.gdb.HOST" value="127.0.0.1"/>
+<stringAttribute key="org.eclipse.cdt.dsf.gdb.PORT" value="26102"/>
+<booleanAttribute key="org.eclipse.cdt.dsf.gdb.REMOTE_TCP" value="true"/>
+<stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="run"/>
+<booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN" value="true"/>
+<stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN_SYMBOL" value="main"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug/gosleepnyx"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="gosleepnyx"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="org.tizen.nativecore.config.sbi.gcc45.app.debug.556908221"/>
+<stringAttribute key="org.eclipse.cdt.launch.WORKING_DIRECTORY" value=""/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/gosleepnyx"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+<stringAttribute key="org.tizen.common.CONFIG_ATTR_PROJECT_NAME" value="Debug/gosleepnyx"/>
+<booleanAttribute key="org.tizen.common.launch.device.emulator" value="false"/>
+<stringAttribute key="org.tizen.common.launch.device.id" value="192.168.0.41:26101"/>
+<stringAttribute key="org.tizen.nativeapp.launch.PROJECT_BUILD_CONFIG_NAME_ATTR" value="Debug"/>
+<booleanAttribute key="org.tizen.nativecommon.ATTR_SHOW_WARNING" value="false"/>
+<stringAttribute key="process_factory_id" value="org.eclipse.cdt.dsf.gdb.GdbProcessFactory"/>
+</launchConfiguration>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<manifest xmlns="http://tizen.org/ns/packages" api-version="6.0" package="org.example.basicui" version="1.0.0">
+    <profile name="wearable"/>
+    <ui-application appid="org.example.basicui" exec="basicui" multiple="false" nodisplay="false" taskmanage="true" type="capp">
+        <label>basicui</label>
+        <icon>basicui.png</icon>
+    </ui-application>
+    <feature name="http://tizen.org/feature/screen.size.all">true</feature>
+</manifest>

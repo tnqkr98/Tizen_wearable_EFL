@@ -1,0 +1,10 @@
+22:52:14 **** Incremental Build of configuration Debug for project gosleepnyx ****
+ninja all 
+[1/2] Building src/gosleepnyx.o
+[2/2] Linking gosleepnyx
+22:52:29 **** Incremental Build of configuration Debug for project gosleepnyx ****
+ninja all 
+[1/2] Building src/gosleepnyx.o
+clang.exe: warning: -Wl,--hash-style=gnu: 'linker' input unused [-Wunused-command-line-argument]
+
+[2/2] Linking gosleepnyx
