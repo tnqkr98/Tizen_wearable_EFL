@@ -1,5 +1,4 @@
 #include "gosleepnyx.h"
-#include <sensor.h>
 
 typedef struct appdata {
 	Evas_Object *win;
@@ -7,47 +6,46 @@ typedef struct appdata {
 	Evas_Object *label;
 } appdata_s;
 
-sensor_type_e type = SENSOR_HRM;
-sensor_h sensor;
-
-bool supported;
-
-static void win_delete_request_cb(void *data, Evas_Object *obj, void *event_info)	// 앱 삭제 요청 발생 시 실행되는 이벤트 함수
+static void
+win_delete_request_cb(void *data, Evas_Object *obj, void *event_info)
 {
 	ui_app_exit();
 }
 
-static void win_back_cb(void *data, Evas_Object *obj, void *event_info)		// Back 버튼을 눌렀을 때 실행되는 이벤트 함수
+static void
+win_back_cb(void *data, Evas_Object *obj, void *event_info)
 {
 	appdata_s *ad = data;
 	/* Let window go to hide state. */
 	elm_win_lower(ad->win);
 }
 
-static void create_base_gui(appdata_s *ad)		// 화면을 구성하는 윈도우와 각종 컨테이너. 위젯 생성 함수
+static void
+create_base_gui(appdata_s *ad)
 {
 	/* Window */
-	// elm_win 을 초기화 한다, 화면을 조작하려면 필수다 이건.
-	ad->win = elm_win_util_standard_add(PACKAGE, PACKAGE); 		  // Window(화면 레이아웃 최상위 객체) 객체를 생성하는 API.
+	/* Create and initialize elm_win.
+	   elm_win is mandatory to manipulate window. */
+	ad->win = elm_win_util_standard_add(PACKAGE, PACKAGE);
 	elm_win_autodel_set(ad->win, EINA_TRUE);
 
 	if (elm_win_wm_rotation_supported_get(ad->win)) {
 		int rots[4] = { 0, 90, 180, 270 };
-		elm_win_wm_rotation_available_rotations_set(ad->win, (const int *)(&rots), 4);	// 화면이 모든 회전 각도를 지원하도록 함.
+		elm_win_wm_rotation_available_rotations_set(ad->win, (const int *)(&rots), 4);
 	}
 
-	// 스마트 오브젝트(위젯,컨테이너 등)에 이벤트 콜백함수 지정. " delete, request" 이벤트 팔생시 , win_delete_request_cb 콜백
 	evas_object_smart_callback_add(ad->win, "delete,request", win_delete_request_cb, NULL);
-	// 오브젝트에 이벤트 콜백함수 지정. API
 	eext_object_event_callback_add(ad->win, EEXT_CALLBACK_BACK, win_back_cb, ad);
 
 	/* Conformant */
-	/*  conformant 는 화면에 새 영역이 추가 될때 (ex. 키패드) 윈도우 크기를 변경해줌. 하나의 앱은 하나의 conformant 만을 가져야함*/
+	/* Create and initialize elm_conformant.
+	   elm_conformant is mandatory for base gui to have proper size
+	   when indicator or virtual keypad is visible. */
 	ad->conform = elm_conformant_add(ad->win);
-	elm_win_indicator_mode_set(ad->win, ELM_WIN_INDICATOR_SHOW);		// 화면 위쪽 indicator(상태바) 표시 여부 지정
-	elm_win_indicator_opacity_set(ad->win, ELM_WIN_INDICATOR_OPAQUE);   // indicator 투명도 지정
-	evas_object_size_hint_weight_set(ad->conform, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);    // 오브젝트의 크기를 대략적으로 지정 (EVAS_HINT_EXPAND 는 공간이 허락하는만큼)
-	elm_win_resize_object_add(ad->win, ad->conform); //
+	elm_win_indicator_mode_set(ad->win, ELM_WIN_INDICATOR_SHOW);
+	elm_win_indicator_opacity_set(ad->win, ELM_WIN_INDICATOR_OPAQUE);
+	evas_object_size_hint_weight_set(ad->conform, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	elm_win_resize_object_add(ad->win, ad->conform);
 	evas_object_show(ad->conform);
 
 	/* Label */
@@ -62,7 +60,8 @@ static void create_base_gui(appdata_s *ad)		// 화면을 구성하는 윈도우�
 	evas_object_show(ad->win);
 }
 
-static bool app_create(void *data)
+static bool
+app_create(void *data)
 {
 	/* Hook to take necessary actions before main event loop starts
 		Initialize UI resources and application's data
@@ -75,27 +74,32 @@ static bool app_create(void *data)
 	return true;
 }
 
-static void app_control(app_control_h app_control, void *data)
+static void
+app_control(app_control_h app_control, void *data)
 {
 	/* Handle the launch request. */
 }
 
-static void app_pause(void *data)
+static void
+app_pause(void *data)
 {
 	/* Take necessary actions when application becomes invisible. */
 }
 
-static void app_resume(void *data)
+static void
+app_resume(void *data)
 {
 	/* Take necessary actions when application becomes visible. */
 }
 
-static void app_terminate(void *data)
+static void
+app_terminate(void *data)
 {
 	/* Release all resources. */
 }
 
-static void ui_app_lang_changed(app_event_info_h event_info, void *user_data)
+static void
+ui_app_lang_changed(app_event_info_h event_info, void *user_data)
 {
 	/*APP_EVENT_LANGUAGE_CHANGED*/
 	char *locale = NULL;
@@ -105,28 +109,33 @@ static void ui_app_lang_changed(app_event_info_h event_info, void *user_data)
 	return;
 }
 
-static void ui_app_orient_changed(app_event_info_h event_info, void *user_data)
+static void
+ui_app_orient_changed(app_event_info_h event_info, void *user_data)
 {
 	/*APP_EVENT_DEVICE_ORIENTATION_CHANGED*/
 	return;
 }
 
-static void ui_app_region_changed(app_event_info_h event_info, void *user_data)
+static void
+ui_app_region_changed(app_event_info_h event_info, void *user_data)
 {
 	/*APP_EVENT_REGION_FORMAT_CHANGED*/
 }
 
-static void ui_app_low_battery(app_event_info_h event_info, void *user_data)
+static void
+ui_app_low_battery(app_event_info_h event_info, void *user_data)
 {
 	/*APP_EVENT_LOW_BATTERY*/
 }
 
-static void ui_app_low_memory(app_event_info_h event_info, void *user_data)
+static void
+ui_app_low_memory(app_event_info_h event_info, void *user_data)
 {
 	/*APP_EVENT_LOW_MEMORY*/
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	appdata_s ad = {0,};
 	int ret = 0;
