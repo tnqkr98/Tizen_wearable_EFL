@@ -5,5 +5,8 @@
         <label>gosleepnyx</label>
         <icon>gosleepnyx.png</icon>
     </ui-application>
+    <privileges>
+        <privilege>http://tizen.org/privilege/healthinfo</privilege>
+    </privileges>
     <feature name="http://tizen.org/feature/screen.size.all">true</feature>
 </manifest>

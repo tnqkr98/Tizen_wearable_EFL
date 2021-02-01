@@ -3370,3 +3370,28 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY org.eclipse.launchbar.core 2 0 2021-01-25 22:52:21.490
 !MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+!SESSION 2021-02-01 22:45:35.214 -----------------------------------------------
+eclipse.buildId=4.1 
+java.version=1.8.0_242
+java.vendor=Amazon.com Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 2 0 2021-02-01 22:45:45.838
+!MESSAGE Warnings while parsing the images from the 'org.eclipse.ui.commandImages' extension point.
+!SUBENTRY 1 org.eclipse.ui 2 0 2021-02-01 22:45:45.838
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.RepositoriesViewRefresh'
+!SUBENTRY 1 org.eclipse.ui 2 0 2021-02-01 22:45:45.838
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.org.eclipse.egit.ui.AbortRebase'
+!SUBENTRY 1 org.eclipse.ui 2 0 2021-02-01 22:45:45.838
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.history.RenameBranch'
+
+!ENTRY org.eclipse.egit.ui 2 0 2021-02-01 22:45:57.301
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Donghan Park'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.tizen.common.ui.Startup 1 0 2021-02-01 22:45:57.311
+!MESSAGE SDK Information: Path [C:\tizen-studio], Data Path [C:\tizen-studio-data], Platform Path [C:\tizen-studio\platforms\tizen-6.0\wearable]

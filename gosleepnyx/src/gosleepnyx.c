@@ -4,18 +4,100 @@
 typedef struct appdata {
 	Evas_Object *win;
 	Evas_Object *conform;
-	Evas_Object *label;
+	Evas_Object *label1;
+	Evas_Object *label2;
 } appdata_s;
 
-sensor_type_e type = SENSOR_HRM;
-sensor_h sensor;
+// sensing
+Evas_Object *navi;
+Evas_Object *start, *stop;
+Evas_Object *event_label;
+sensor_listener_h listener;
 
-bool supported;
+/*------------------------------------------------------- 센싱 콜백 세팅 ---------------------------------------------------- */
+void on_sensor_event(sensor_h sensor, sensor_event_s *event, void *user_data){
+	sensor_type_e type;
+	sensor_get_type(sensor, &type);
 
-static void win_delete_request_cb(void *data, Evas_Object *obj, void *event_info)	// 앱 삭제 요청 발생 시 실행되는 이벤트 함수
-{
-	ui_app_exit();
+	switch(type){
+		case SENSOR_HRM:
+			dlog_print(DLOG_INFO, LOG_TAG, "%d", event->values[0]);
+			char a[100];
+			sprintf(a,"f",event->values[0]);
+			elm_object_text_set(event_label,a);
+			break;
+		default:
+			dlog_print(DLOG_ERROR, LOG_TAG, "Not an HRM event");
+	}
 }
+
+void _sensor_accuracy_changed_cb(sensor_h sensor, unsigned long long timestamp, sensor_data_accuracy_e accuracy, void *data){
+	dlog_print(DLOG_DEBUG, LOG_TAG, "Sensor accuracy change callback invoked");
+}
+
+void _sensor_start_cb(void *data, Evas_object *obj, void *event_info){
+	void *user_data = NULL;
+	char out[100];
+
+	// Retrieving a Sensor		 HRM 센서가 있는지 확인  ------------------------------------------------------
+	sensor_type_e type = SENSOR_HRM;
+	sensor_h sensor;
+
+	bool supported;
+	int error = sensor_is_supported(type, &supported);
+	if(error != SENSOR_ERROR_NONE){
+		dlog_print(DLOG_ERROR, LOG_TAG, "sensor is supported error : %d",error);
+		return;
+	}
+	
+	//Get sensor list ? 왜 ? 한 보드에 HRM 센서가 여러개? 있을수있는 건가? (red, green 빛기반?) ----------------
+	int count;
+	sensor_h *list;
+	error = sensor_get_sensor_list(type, &list, &count);
+	if(error != SENSOR_ERROR_NONE)
+		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_get_sensor_list error : %d",error);
+	else{
+		dlog_print(DLOG_DEBUG,LOG_TAG, "Number of sensors: %d",count);
+		free(list);
+	}
+
+	error = sensor_get_default_sensor(type, &sensor);
+	if(error != SENSOR_ERROR_NONE){
+		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_get_default_sensor error : %d", error);
+		return;		// 기본 센서도 없으면 아예 종료
+	}
+
+	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_get_default_sensor");	// 기본 센서 참조획득
+
+	// 센서 리스너 등록, min_interval 값 획득  --------------------------------------------------------------------------------
+	error = sensor_create_listener(sensor, &listener);
+	if(error != SENSOR_ERROR_NONE){
+		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_create_listener_error : %d", error);
+		return;
+	}
+
+	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_get_default_sensor");	// 기본 센서 참조획득
+
+	int min_interval = 0;
+	error = sensor_get_min_interval(sensor, &min_interval);
+	if(error != SENSOR_ERROR_NONE){
+		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_get_min_interval_error : %d", error);
+		return;
+	}
+
+	dlog_print(DLOG_DEBUG, LOG_TAG, "Minimal interval of the sensor : %d", min_interval);	// Minmal interval  값
+
+	// 센서 리스너에 콜백 등록
+
+
+
+
+}
+
+/*------------------------------------------------------  기본 시스템 세팅 -------------------------------------------------- */
+
+// 앱 삭제 요청 발생 시 실행되는 이벤트 함수
+static void win_delete_request_cb(void *data, Evas_Object *obj, void *event_info) {ui_app_exit();}
 
 static void win_back_cb(void *data, Evas_Object *obj, void *event_info)		// Back 버튼을 눌렀을 때 실행되는 이벤트 함수
 {
@@ -47,56 +129,42 @@ static void create_base_gui(appdata_s *ad)		// 화면을 구성하는 윈도우�
 	elm_win_indicator_mode_set(ad->win, ELM_WIN_INDICATOR_SHOW);		// 화면 위쪽 indicator(상태바) 표시 여부 지정
 	elm_win_indicator_opacity_set(ad->win, ELM_WIN_INDICATOR_OPAQUE);   // indicator 투명도 지정
 	evas_object_size_hint_weight_set(ad->conform, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);    // 오브젝트의 크기를 대략적으로 지정 (EVAS_HINT_EXPAND 는 공간이 허락하는만큼)
-	elm_win_resize_object_add(ad->win, ad->conform); //
-	evas_object_show(ad->conform);
+	elm_win_resize_object_add(ad->win, ad->conform); // window 객체에 다른 객체를 추가하며 크기를 변경하는 API
+	evas_object_show(ad->conform);   // 오브젝트를 화면에 표시. 모든 오브젝트에 공통적으로 사용가능한함수
 
 	/* Label */
-	/* Create an actual view of the base gui.
-	   Modify this part to change the view. */
-	ad->label = elm_label_add(ad->conform);
-	elm_object_text_set(ad->label, "<align=center>Hello NYX</align>");
-	evas_object_size_hint_weight_set(ad->label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	elm_object_content_set(ad->conform, ad->label);
+	ad->label1 = elm_label_add(ad->conform);
+	//elm_object_text_set(ad->label, "<align=center>Hello NYX</align>");
+	elm_object_text_set(ad->label1,"HRM");
+	//evas_object_size_hint_weight_set(ad->label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);	// 객체의 크기를 지정. 2,3번째가 수평 수직 크기
+	//elm_object_content_set(ad->conform, ad->label);		// 위젯의 캡션 택스트를 변경. 위젯?은 conformant 고 그 캡션?텍스트를 label로 지정한건가? conform에 속해서 show 안해도 보임!!
+	evas_object_move(ad->label1, 100,100);		// x , y
+	evas_object_resize(ad->label1,400,100);    // w , h
+	evas_object_show(ad->label1);
+	ad->label2 = elm_label_add(ad->conform);
+	elm_object_text_set(ad->label2,"ACC");
+	evas_object_move(ad->label2, 100,150);		// x , y
+	evas_object_resize(ad->label2,400,100);    // w , h
+	evas_object_color_set(ad->label2, 255, 0, 0, 255);
+	evas_object_show(ad->label2);
 
 	/* Show window after base gui is set up */
 	evas_object_show(ad->win);
 }
 
-static bool app_create(void *data)
-{
-	/* Hook to take necessary actions before main event loop starts
-		Initialize UI resources and application's data
-		If this function returns true, the main loop of application starts
-		If this function returns false, the application is terminated */
+static bool app_create(void *data){
 	appdata_s *ad = data;
-
 	create_base_gui(ad);
 
 	return true;
 }
 
-static void app_control(app_control_h app_control, void *data)
-{
-	/* Handle the launch request. */
-}
+static void app_control(app_control_h app_control, void *data){/* Handle the launch request. */}
+static void app_pause(void *data){/* Take necessary actions when application becomes invisible. */}
+static void app_resume(void *data){/* Take necessary actions when application becomes visible. */}
+static void app_terminate(void *data){/* Release all resources. */}
 
-static void app_pause(void *data)
-{
-	/* Take necessary actions when application becomes invisible. */
-}
-
-static void app_resume(void *data)
-{
-	/* Take necessary actions when application becomes visible. */
-}
-
-static void app_terminate(void *data)
-{
-	/* Release all resources. */
-}
-
-static void ui_app_lang_changed(app_event_info_h event_info, void *user_data)
-{
+static void ui_app_lang_changed(app_event_info_h event_info, void *user_data){
 	/*APP_EVENT_LANGUAGE_CHANGED*/
 	char *locale = NULL;
 	system_settings_get_value_string(SYSTEM_SETTINGS_KEY_LOCALE_LANGUAGE, &locale);
@@ -105,26 +173,10 @@ static void ui_app_lang_changed(app_event_info_h event_info, void *user_data)
 	return;
 }
 
-static void ui_app_orient_changed(app_event_info_h event_info, void *user_data)
-{
-	/*APP_EVENT_DEVICE_ORIENTATION_CHANGED*/
-	return;
-}
-
-static void ui_app_region_changed(app_event_info_h event_info, void *user_data)
-{
-	/*APP_EVENT_REGION_FORMAT_CHANGED*/
-}
-
-static void ui_app_low_battery(app_event_info_h event_info, void *user_data)
-{
-	/*APP_EVENT_LOW_BATTERY*/
-}
-
-static void ui_app_low_memory(app_event_info_h event_info, void *user_data)
-{
-	/*APP_EVENT_LOW_MEMORY*/
-}
+static void ui_app_orient_changed(app_event_info_h event_info, void *user_data){/*APP_EVENT_DEVICE_ORIENTATION_CHANGED*/return;}
+static void ui_app_region_changed(app_event_info_h event_info, void *user_data){/*APP_EVENT_REGION_FORMAT_CHANGED*/}
+static void ui_app_low_battery(app_event_info_h event_info, void *user_data){/*APP_EVENT_LOW_BATTERY*/}
+static void ui_app_low_memory(app_event_info_h event_info, void *user_data){/*APP_EVENT_LOW_MEMORY*/}
 
 int main(int argc, char *argv[])
 {
