@@ -1,15 +1,9 @@
 #include "gosleepnyx.h"
-#include <sensor.h>
-
-typedef struct appdata {
-	Evas_Object *win;
-	Evas_Object *conform;
-	Evas_Object *label1;
-	Evas_Object *label2;
-} appdata_s;
+#define BUFLEN 200
 
 // sensing
-Evas_Object *navi;
+Evas_Object *GLOBAL_DEBUG_BOX;
+Evas_Object *conform;
 Evas_Object *start, *stop;
 Evas_Object *event_label;
 sensor_listener_h listener;
@@ -21,9 +15,9 @@ void on_sensor_event(sensor_h sensor, sensor_event_s *event, void *user_data){
 
 	switch(type){
 		case SENSOR_HRM:
-			dlog_print(DLOG_INFO, LOG_TAG, "%d", event->values[0]);
+			dlog_print(DLOG_INFO, LOG_TAG, "sensor_hrm : %f", event->values[0]);
 			char a[100];
-			sprintf(a,"f",event->values[0]);
+			sprintf(a,"%f",event->values[0]);
 			elm_object_text_set(event_label,a);
 			break;
 		default:
@@ -35,7 +29,7 @@ void _sensor_accuracy_changed_cb(sensor_h sensor, unsigned long long timestamp, 
 	dlog_print(DLOG_DEBUG, LOG_TAG, "Sensor accuracy change callback invoked");
 }
 
-void _sensor_start_cb(void *data, Evas_object *obj, void *event_info){
+void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 	void *user_data = NULL;
 	char out[100];
 
@@ -135,7 +129,7 @@ void _sensor_start_cb(void *data, Evas_object *obj, void *event_info){
 	// 센싱 데이터 화면 출력
 	switch(type){
 		case SENSOR_HRM:
-			dlog_print(DLOG_INFO, LOG_TAG, "%f", event.values[0]);
+			dlog_print(DLOG_INFO, LOG_TAG, "sensor_hrm : %f", event.values[0]);
 			sprintf(out,"%f",event.values[0]);
 			break;
 		default:
@@ -276,7 +270,7 @@ void _create_new_cd_display(appdata_s *ad, char *name, void *cb){
     start = _new_button(ad, box, "Start", _sensor_start_cb);
 
     event_label = elm_label_add(box);
-    elm_object_text_set(event_label, "Press Start and Wait");
+    elm_object_text_set(event_label, "NYX HRM!");
     elm_box_pack_end(box, event_label);
     evas_object_show(event_label);
 
@@ -301,6 +295,7 @@ static void create_base_gui(appdata_s *ad)		// 화면을 구성하는 윈도우�
 	// elm_win 을 초기화 한다, 화면을 조작하려면 필수다 이건.
 	ad->win = elm_win_util_standard_add(PACKAGE, PACKAGE); 		  // Window(화면 레이아웃 최상위 객체) 객체를 생성하는 API.
 	elm_win_autodel_set(ad->win, EINA_TRUE);
+	elm_win_conformant_set(ad->win,EINA_TRUE);
 	elm_win_indicator_mode_set(ad->win, ELM_WIN_INDICATOR_SHOW);		// 화면 위쪽 indicator(상태바) 표시 여부 지정
 	elm_win_indicator_opacity_set(ad->win, ELM_WIN_INDICATOR_OPAQUE);   // indicator 투명도 지정
 
@@ -316,13 +311,26 @@ static void create_base_gui(appdata_s *ad)		// 화면을 구성하는 윈도우�
 
 	/* Conformant */
 	/*  conformant 는 화면에 새 영역이 추가 될때 (ex. 키패드) 윈도우 크기를 변경해줌. 하나의 앱은 하나의 conformant 만을 가져야함*/
-	ad->conform = elm_conformant_add(ad->win);
-	evas_object_size_hint_weight_set(ad->conform, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);    // 오브젝트의 크기를 대략적으로 지정 (EVAS_HINT_EXPAND 는 공간이 허락하는만큼)
-	elm_win_resize_object_add(ad->win, ad->conform); // window 객체에 다른 객체를 추가하며 크기를 변경하는 API
-	evas_object_show(ad->conform);   // 오브젝트를 화면에 표시. 모든 오브젝트에 공통적으로 사용가능한함수
+	conform = elm_conformant_add(ad->win);
+	evas_object_size_hint_weight_set(conform, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);    // 오브젝트의 크기를 대략적으로 지정 (EVAS_HINT_EXPAND 는 공간이 허락하는만큼)
+	elm_win_resize_object_add(ad->win, conform); // window 객체에 다른 객체를 추가하며 크기를 변경하는 API
+	evas_object_show(conform);   // 오브젝트를 화면에 표시.
+
+	/* Create a naviframe */
+	ad->navi = elm_naviframe_add(conform);
+	evas_object_size_hint_align_set(ad->navi, EVAS_HINT_FILL, EVAS_HINT_FILL);
+	evas_object_size_hint_weight_set(ad->navi, EVAS_HINT_EXPAND,EVAS_HINT_EXPAND);
+
+	elm_object_content_set(conform, ad->navi);
+	evas_object_show(ad->navi);
+
+	// 메인윈도우에 버튼생성
+	_create_new_cd_display(ad, "Sensor", _pop_cb);
+	eext_object_event_callback_add(ad->navi, EEXT_CALLBACK_BACK, eext_naviframe_back_cb,NULL);
+
 
 	/* Label */
-	ad->label1 = elm_label_add(ad->conform);
+	/*ad->label1 = elm_label_add(ad->conform);
 	//elm_object_text_set(ad->label, "<align=center>Hello NYX</align>");
 	elm_object_text_set(ad->label1,"HRM");
 	//evas_object_size_hint_weight_set(ad->label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);	// 객체의 크기를 지정. 2,3번째가 수평 수직 크기
@@ -335,7 +343,7 @@ static void create_base_gui(appdata_s *ad)		// 화면을 구성하는 윈도우�
 	evas_object_move(ad->label2, 100,150);		// x , y
 	evas_object_resize(ad->label2,400,100);    // w , h
 	evas_object_color_set(ad->label2, 255, 0, 0, 255);
-	//evas_object_show(ad->label2);
+	//evas_object_show(ad->label2);*/
 
 	/* Show window after base gui is set up */
 	evas_object_show(ad->win);

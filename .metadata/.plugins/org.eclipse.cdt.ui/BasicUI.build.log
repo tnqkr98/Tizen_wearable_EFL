@@ -1,6 +1,6 @@
-22:48:42 **** Incremental Build of configuration Debug for project BasicUI ****
+16:40:31 **** Build of configuration Debug for project BasicUI ****
 ninja all 
 ninja: no work to do.
 
-22:48:42 Build Finished (took 151ms)
+16:40:32 Build Finished (took 419ms)
 
