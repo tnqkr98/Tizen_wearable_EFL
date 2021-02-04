@@ -1,4 +1,4 @@
-16:30:20 **** Incremental Build of configuration Debug for project gosleepnyx ****
+21:45:50 **** Incremental Build of configuration Debug for project gosleepnyx ****
 ninja all 
 [1/2] Building src/gosleepnyx.o
 clang.exe: warning: -Wl,--hash-style=gnu: 'linker' input unused [-Wunused-command-line-argument]
@@ -19,9 +19,9 @@ C:/tizen-studio/tools/smart-build-interface/../../platforms/tizen-5.5/wearable/r
 
                                                            ^
 
-../src/gosleepnyx.c:82:10: warning: 'sensor_listener_set_event_cb' is deprecated [-Wdeprecated-declarations]
+../src/gosleepnyx.c:93:10: warning: 'sensor_listener_set_event_cb' is deprecated [-Wdeprecated-declarations]
 
-        error = sensor_listener_set_event_cb(listener, min_interval, on_sensor_event, user_data);
+        error = sensor_listener_set_event_cb(listener_hrm, min_interval, on_sensor_event, user_data);
 
                 ^
 
@@ -31,9 +31,21 @@ int sensor_listener_set_event_cb(sensor_listener_h listener, unsigned int interv
 
     ^
 
-../src/gosleepnyx.c:123:10: warning: 'sensor_listener_read_data' is deprecated [-Wdeprecated-declarations]
+../src/gosleepnyx.c:99:2: warning: 'sensor_listener_set_event_cb' is deprecated [-Wdeprecated-declarations]
 
-        error = sensor_listener_read_data(listener, &event);
+        sensor_listener_set_event_cb(listener_acc, min_interval, on_sensor_event, user_data);
+
+        ^
+
+C:/tizen-studio/tools/smart-build-interface/../../platforms/tizen-5.5/wearable/rootstraps/wearable-5.5-device.core/usr/include/sensor\sensor.h:910:5: note: 'sensor_listener_set_event_cb' has been explicitly marked deprecated here
+
+int sensor_listener_set_event_cb(sensor_listener_h listener, unsigned int interval_ms, sensor_event_cb callback, void *data) TIZEN_DEPRECATED_API;
+
+    ^
+
+../src/gosleepnyx.c:139:10: warning: 'sensor_listener_read_data' is deprecated [-Wdeprecated-declarations]
+
+        error = sensor_listener_read_data(listener_hrm, &event);
 
                 ^
 
@@ -43,23 +55,27 @@ int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event)
 
     ^
 
-../src/gosleepnyx.c:138:34: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+../src/gosleepnyx.c:144:2: warning: 'sensor_listener_read_data' is deprecated [-Wdeprecated-declarations]
 
-        dlog_print(DLOG_DEBUG, LOG_TAG, out);
+        sensor_listener_read_data(listener_acc, &event);
 
-                                        ^~~
+        ^
 
-../src/gosleepnyx.c:138:34: note: treat the string as an argument to avoid this
+C:/tizen-studio/tools/smart-build-interface/../../platforms/tizen-5.5/wearable/rootstraps/wearable-5.5-device.core/usr/include/sensor\sensor.h:1024:5: note: 'sensor_listener_read_data' has been explicitly marked deprecated here
 
-        dlog_print(DLOG_DEBUG, LOG_TAG, out);
+int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event) TIZEN_DEPRECATED_API;
 
-                                        ^
+    ^
 
-                                        "%s", 
+../src/gosleepnyx.c:40:7: warning: unused variable 'out' [-Wunused-variable]
 
-../src/gosleepnyx.c:215:17: warning: 'sensor_listener_unset_event_cb' is deprecated [-Wdeprecated-declarations]
+        char out[100];
 
-    int error = sensor_listener_unset_event_cb(listener);
+             ^
+
+../src/gosleepnyx.c:232:17: warning: 'sensor_listener_unset_event_cb' is deprecated [-Wdeprecated-declarations]
+
+    int error = sensor_listener_unset_event_cb(listener_hrm);
 
                 ^
 
@@ -69,21 +85,9 @@ int sensor_listener_unset_event_cb(sensor_listener_h listener) TIZEN_DEPRECATED_
 
     ^
 
-5 warnings generated.
+7 warnings generated.
 
 [2/2] Linking gosleepnyx
-16:32:17 **** Incremental Build of configuration Debug for project gosleepnyx ****
-ninja all 
-ninja: no work to do.
-16:37:17 **** Incremental Build of configuration Debug for project gosleepnyx ****
-ninja all 
-ninja: no work to do.
-16:39:50 **** Incremental Build of configuration Debug for project gosleepnyx ****
-ninja all 
-ninja: no work to do.
-16:40:31 **** Build of configuration Debug for project BasicUI ****
-ninja all 
-ninja: no work to do.
-16:40:32 **** Incremental Build of configuration Debug for project gosleepnyx ****
+21:46:23 **** Incremental Build of configuration Debug for project gosleepnyx ****
 ninja all 
 ninja: no work to do.

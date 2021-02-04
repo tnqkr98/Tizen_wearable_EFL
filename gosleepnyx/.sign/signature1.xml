@@ -4,13 +4,13 @@
 <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"></SignatureMethod>
 <Reference URI="author-signature.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
-<DigestValue>LfC4DH4WiCzl//mhrvOKuZoSFDnMt6z5VeTpRLaSvY6C+5hgV1/fpR3JyxVs2VzIIuMeIWWBg545
-Wjgn01sYAg==</DigestValue>
+<DigestValue>JPSpo0AN0KF5Ruwwede442x78qwxHoFAyUhVHriS6SN3PS/zfCp4UdqFjSPTrYU3mtFMWnVf3MM3
+7hcBa7qW6A==</DigestValue>
 </Reference>
 <Reference URI="bin%2Fgosleepnyx">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
-<DigestValue>PKD62uk4DL4y2RHGJjC8lkaYXWwIRvZijaEDNdZfkcgeKdQ1rmvV4xN3q2S3cp+YMV/Me3sTQOLs
-iUHXqhYDjQ==</DigestValue>
+<DigestValue>883nNptnyKHcnOnpDx6z7A5KpYFQnKEO9xL6kqXm6UEXfxeOx174UIWjEeyUfhnwF9bjLbPxOOUJ
+ymP5/yKS6g==</DigestValue>
 </Reference>
 <Reference URI="shared%2Fres%2Fgosleepnyx.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
@@ -32,11 +32,11 @@ GyvKX9Snig==</DigestValue>
 </Reference>
 </SignedInfo>
 <SignatureValue>
-N+YBmwt3n8QOQOcwIuivGUwQLqOc5lZODeHaduIi1zEysWStnn5py0M0LViIUk+GgBPzdGcIFism
-FWSvoDV8q61zEXWTsuJZgeRbSIwd1MXsYUEfrsjdgG9cJRzR3Orf8r+Fc1sZCJi4UyHqiQSARImM
-L2NOG9Pm6/zzr4toO3o8HN0KzCoua50fP9F93C+wSuWuGbTQK+SY05CQhWb8sd9JS++RAm5B567B
-GA1n4FSkQ4lVeHGVev1/SNkEZlId2AoyOM8ApATQsNgO9vKsPZ3BANcjnX8pYOJXofhvFkNxKWXe
-OszSCfo5a3IhicxdhUGtpmJATmerqSKlOCi60w==
+V1EMvmgb0VS+PBcOdNrfUA6YyTY5uLau+WnaEuCBOI3BomqBb9kgXr92GCLP5AnVK2YiqzihOpFk
+Z/ELGtHGmb7S5uB2AYXQ4K+Y7pEtvF02i+DfPU4EVJSR70OBzVbBYXCgx8aWSc1/V2mdRTJDeO48
+0NCJH2wNZzsRwbArIJ5FIxHlF313RGB3DbC57cyTlZs48O5NiHQyVbAOgkKu6TeRen7TCrFIYiwE
+HV7i5c1X/Cd99PojkJawN5Vaqe+TvouBVkConycTIvwuS+xWq6t6TeD5WglRo1D82rz7dBV2kTLg
+eE2bSeDShTaXrk7HtUX4UuHwikhML8kokNlpDw==
 </SignatureValue>
 <KeyInfo>
 <X509Data>

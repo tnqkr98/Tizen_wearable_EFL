@@ -5,20 +5,26 @@
 Evas_Object *GLOBAL_DEBUG_BOX;
 Evas_Object *conform;
 Evas_Object *start, *stop;
-Evas_Object *event_label;
-sensor_listener_h listener;
+Evas_Object *hrm_label, *acc_label;
+sensor_listener_h listener_hrm, listener_acc;
 
 /*------------------------------------------------------- 센싱 콜백 세팅 ---------------------------------------------------- */
 void on_sensor_event(sensor_h sensor, sensor_event_s *event, void *user_data){
 	sensor_type_e type;
-	sensor_get_type(sensor, &type);
+	sensor_get_type(sensor, &type);		// 이벤트 발생 센서 파악
 
 	switch(type){
 		case SENSOR_HRM:
-			dlog_print(DLOG_INFO, LOG_TAG, "sensor_hrm : %f", event->values[0]);
+			dlog_print(DLOG_INFO, LOG_TAG, "sensor_hrm : %.1f", event->values[0]);
 			char a[100];
-			sprintf(a,"%f",event->values[0]);
-			elm_object_text_set(event_label,a);
+			sprintf(a,"HRM : %.1f",event->values[0]);
+			elm_object_text_set(hrm_label,a);
+			break;
+		case SENSOR_ACCELEROMETER:
+			dlog_print(DLOG_INFO, LOG_TAG, "sensor_acc : x = %.1f , y = %.1f , z = %.1f ", event->values[0], event->values[1],event->values[2]);
+			char b[100];
+			sprintf(b,"x: %.1f y: %.1f z: %.1f",event->values[0],event->values[1],event->values[2]);
+			elm_object_text_set(acc_label,b);
 			break;
 		default:
 			dlog_print(DLOG_ERROR, LOG_TAG, "Not an HRM event");
@@ -33,21 +39,23 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 	void *user_data = NULL;
 	char out[100];
 
-	// Retrieving a Sensor		 HRM 센서가 있는지 확인  ------------------------------------------------------
+	// Retrieving a Sensor		 센서가 있는지 확인  ------------------------------------------------------
 	sensor_type_e type = SENSOR_HRM;
-	sensor_h sensor;
+	sensor_h sensor, sensor_acc;
 
 	bool supported;
-	int error = sensor_is_supported(type, &supported);
-	if(error != SENSOR_ERROR_NONE){
-		dlog_print(DLOG_ERROR, LOG_TAG, "sensor is supported error : %d",error);
-		return;
-	}
-	
+	int error;
+
+	sensor_is_supported(SENSOR_HRM, &supported);
+	if(!supported){return;}		// 심박수 지원 X
+
+	sensor_is_supported(SENSOR_ACCELEROMETER, &supported);
+	if(!supported){return;}		// 가속도 지원 X
+
 	//Get sensor list ? 왜 ? 한 보드에 HRM 센서가 여러개? 있을수있는 건가? (red, green 빛기반?) ----------------
 	int count;
 	sensor_h *list;
-	error = sensor_get_sensor_list(type, &list, &count);
+	error = sensor_get_sensor_list(SENSOR_HRM, &list, &count);
 	if(error != SENSOR_ERROR_NONE)
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_get_sensor_list error : %d",error);
 	else{
@@ -55,15 +63,18 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 		free(list);
 	}
 
-	error = sensor_get_default_sensor(type, &sensor);
+	error = sensor_get_default_sensor(SENSOR_HRM, &sensor);		// 심박수 센서 참조획득
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_get_default_sensor error : %d", error);
-		return;		// 기본 센서도 없으면 아예 종료
+		return;	
 	}
-	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_get_default_sensor");	// 기본 센서 참조획득
+	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_get_default_sensor");	
+
+	sensor_get_default_sensor(SENSOR_ACCELEROMETER, &sensor_acc);	// 가속도 센서 참조획득
+	sensor_create_listener(sensor_acc, &listener_acc);		// 가속도 센서 리스너등록
 
 	// 센서 리스너 등록, min_interval 값 획득  --------------------------------------------------------------------------------
-	error = sensor_create_listener(sensor, &listener);
+	error = sensor_create_listener(sensor, &listener_hrm);
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_create_listener_error : %d", error);
 		return;
@@ -79,15 +90,17 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 	dlog_print(DLOG_DEBUG, LOG_TAG, "Minimal interval of the sensor : %d", min_interval);	// Minmal interval  값
 
 	// 센서 리스너에 콜백(센서의 값변화 이벤트) 등록
-	error = sensor_listener_set_event_cb(listener, min_interval, on_sensor_event, user_data);
+	error = sensor_listener_set_event_cb(listener_hrm, min_interval, on_sensor_event, user_data);
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_set_event_cb error : %d",error);
 		return;
 	}
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_set_event_cb");
+	sensor_listener_set_event_cb(listener_acc, min_interval, on_sensor_event, user_data);
+
 
 	// 리스너에 Accuracy Changed 콜백 등록
-	error = sensor_listener_set_accuracy_cb(listener, _sensor_accuracy_changed_cb, user_data);
+	error = sensor_listener_set_accuracy_cb(listener_hrm, _sensor_accuracy_changed_cb, user_data);
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_set_accuracy_cb error : %d", error);
 		return;
@@ -95,15 +108,17 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_set_accuracy_cb");
 
 	// 리스너에 interval 값 지정
-	error = sensor_listener_set_interval(listener,100);
+	error = sensor_listener_set_interval(listener_hrm,100);
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_set_interval error : %d", error);
 		return;
 	}
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_set_interval");
+	sensor_listener_set_interval(listener_acc,200);
+
 
 	// 리스너에 option 지정
-	error = sensor_listener_set_option(listener,SENSOR_OPTION_ALWAYS_ON);
+	error = sensor_listener_set_option(listener_hrm,SENSOR_OPTION_ALWAYS_ON);
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_set_option error : %d", error);
 		return;
@@ -111,23 +126,25 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_set_option");
 
 	// 리스너 시작
-	error = sensor_listener_start(listener);
+	error = sensor_listener_start(listener_hrm);
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_start error : %d", error);
 		return;
 	}
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_start");
+	sensor_listener_start(listener_acc);
 
 	// 센싱
 	sensor_event_s event;
-	error = sensor_listener_read_data(listener, &event);
+	error = sensor_listener_read_data(listener_hrm, &event);
 	if(error != SENSOR_ERROR_NONE){
 		dlog_print(DLOG_DEBUG,LOG_TAG,"sensor_listener_read_data error : %d",error);
 		return;
 	}
+	sensor_listener_read_data(listener_acc, &event);
 
-	// 센싱 데이터 화면 출력
-	switch(type){
+	// 센싱 데이터
+	/*switch(type_hrm){
 		case SENSOR_HRM:
 			dlog_print(DLOG_INFO, LOG_TAG, "sensor_hrm : %f", event.values[0]);
 			sprintf(out,"%f",event.values[0]);
@@ -135,7 +152,7 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 		default:
 			dlog_print(DLOG_ERROR,LOG_TAG,"Not an HRM event!");
 	}
-	dlog_print(DLOG_DEBUG, LOG_TAG, out);
+	dlog_print(DLOG_DEBUG, LOG_TAG, out);*/
 
 	char *name = NULL;
     char *vendor = NULL;
@@ -212,20 +229,22 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 
 void _sensor_stop_cb(void *data, Evas_Object *obj, void *event_info)
 {
-    int error = sensor_listener_unset_event_cb(listener);
+    int error = sensor_listener_unset_event_cb(listener_hrm);
     if (error != SENSOR_ERROR_NONE) {
         dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_unset_event_cb error: %d", error);
     }
 
-    error = sensor_listener_stop(listener);
+    error = sensor_listener_stop(listener_hrm);
     if (error != SENSOR_ERROR_NONE) {
         dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_stop error: %d", error);
     }
+	sensor_listener_stop(listener_acc);
 
-    error = sensor_destroy_listener(listener);
+    error = sensor_destroy_listener(listener_hrm);
     if (error != SENSOR_ERROR_NONE) {
         dlog_print(DLOG_ERROR, LOG_TAG, "sensor_destroy_listener error: %d", error);
     }
+	sensor_destroy_listener(listener_acc);
 
     elm_object_disabled_set(start, EINA_FALSE);
     elm_object_disabled_set(stop, EINA_TRUE);
@@ -269,10 +288,15 @@ void _create_new_cd_display(appdata_s *ad, char *name, void *cb){
 
     start = _new_button(ad, box, "Start", _sensor_start_cb);
 
-    event_label = elm_label_add(box);
-    elm_object_text_set(event_label, "NYX HRM!");
-    elm_box_pack_end(box, event_label);
-    evas_object_show(event_label);
+    hrm_label = elm_label_add(box);
+    elm_object_text_set(hrm_label, "NYX HRM!");
+    elm_box_pack_end(box, hrm_label);
+    evas_object_show(hrm_label);
+
+	acc_label = elm_label_add(box);
+	elm_object_text_set(acc_label, "NYX ACC!");
+    elm_box_pack_end(box, acc_label);
+    evas_object_show(acc_label);
 
     stop = _new_button(ad, box, "Stop", _sensor_stop_cb);
 }

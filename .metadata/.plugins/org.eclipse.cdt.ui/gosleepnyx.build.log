@@ -1,6 +1,6 @@
-16:40:32 **** Incremental Build of configuration Debug for project gosleepnyx ****
+21:46:23 **** Incremental Build of configuration Debug for project gosleepnyx ****
 ninja all 
 ninja: no work to do.
 
-16:40:33 Build Finished (took 251ms)
+21:46:23 Build Finished (took 125ms)
 
