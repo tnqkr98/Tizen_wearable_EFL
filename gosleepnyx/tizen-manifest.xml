@@ -4,6 +4,7 @@
     <ui-application appid="org.example.gosleepnyx" exec="gosleepnyx" multiple="false" nodisplay="false" taskmanage="true" type="capp">
         <label>gosleepnyx</label>
         <icon>gosleepnyx.png</icon>
+        <metadata key="accessory-services-location" value="/res/xml/accessoryservices.xml"/>
     </ui-application>
     <privileges>
         <privilege>http://tizen.org/privilege/healthinfo</privilege>

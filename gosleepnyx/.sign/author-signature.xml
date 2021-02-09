@@ -4,8 +4,8 @@
 <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"></SignatureMethod>
 <Reference URI="bin%2Fgosleepnyx">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
-<DigestValue>883nNptnyKHcnOnpDx6z7A5KpYFQnKEO9xL6kqXm6UEXfxeOx174UIWjEeyUfhnwF9bjLbPxOOUJ
-ymP5/yKS6g==</DigestValue>
+<DigestValue>3rPAgzwbcume396g6QfL/vkMH54SL8KCDGc1GyRj6HpOatWnlRpJd3LOIp+dCHkfSpm8ueOvofqw
+iqhMy7Cl9w==</DigestValue>
 </Reference>
 <Reference URI="shared%2Fres%2Fgosleepnyx.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
@@ -27,11 +27,11 @@ QY10fG1EWQ==</DigestValue>
 </Reference>
 </SignedInfo>
 <SignatureValue>
-qCdazsCwIaGPG/ytNxgGX5Vwt712IXodCQ6VsZQCeEr4HSO2hwpqi8i4hysJYJBrXBBmdGGITfc9
-qemli0rfAz7qz8wycDyGf5qDH0kH5p9LSN2kRwMDTtFEVEBto0b3/jBdqjHOfQzjYNtwOrLYubC9
-C+Th/1+b7abuQ7wEkY27b5FnprGKItgYXU2Y4JVAF9jMK1AKa8iVL672sP7TBeVQGrovhgLsgnNu
-DBbpoviLiEYK7+F1a8WbVnY4BOhnnS+4uMm2FR3Phsjsy6oLRSBJTb7O4XlMBvknZJb9mjKoO49/
-m1yyxjK5igEbRh/ajrR6C20IZB0jI12bEbFMyQ==
+RKYqQzjHUS38Ot9b4EEe/zowiDjOXFFOJYbhbKbPum7RgXj01m5xjzJuFoWrMZsXKO42UJgczgYA
+2dBVwsQJ3RuntLlemTo6qINpwjsAc6EK6pAFmO1JsjsgesA0eeT1DqaIGuNcH4ZeYS1R/cCUzuOV
+rBVTjmCLNFYmAOWyrSzi0ybqsdXalCLHdiSXhUl8OkO9GXa1jjzONq4/dchskLxSoD/3OmSVH0cd
+MFa90fRB3GrcZ4wpw3RPLuZTy+gD2GrtS2KA9r+21S5/GyErZT9nnvPHM1Jv7CTrjg8ztUYn4bIV
+7wOfkb+MQcdgWYHJam7qNpLnTmRMhNCds6FIdg==
 </SignatureValue>
 <KeyInfo>
 <X509Data>

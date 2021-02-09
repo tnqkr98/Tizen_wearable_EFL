@@ -4118,3 +4118,55 @@ java.lang.ClassNotFoundException: org.eclipse.cdt.debug.internal.ui.actions.AddG
 
 !ENTRY org.eclipse.launchbar.core 2 0 2021-02-04 11:50:54.269
 !MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.tizen.common.connection.toolbar.EmulatorLaunchWorker 4 0 2021-02-05 11:43:23.454
+!MESSAGE [2021.02.05 11:43:23][ERROR] EmulatorLaunchWorker.java(93) - Emulator has been booted up: W-5.5-circle-x86
+
+
+!ENTRY org.tizen.nativecommon 4 0 2021-02-05 11:43:30.261
+!MESSAGE Cannot install application.
+!STACK 0
+org.tizen.common.sdb.command.message.CommandErrorException: Security error [-22]
+	at org.tizen.common.sdb.command.message.PkgcmdErrorType.makeException(PkgcmdErrorType.java:135)
+	at org.tizen.common.sdb.command.SdbCommandHelper.runPkgCmd(SdbCommandHelper.java:135)
+	at org.tizen.common.sdb.command.InstallCommand.executeCommand(InstallCommand.java:66)
+	at org.tizen.nativecommon.command.NativeInstallCommand.executeCommand(NativeInstallCommand.java:76)
+	at org.tizen.common.sdb.command.ApplicationCommand.execute(ApplicationCommand.java:81)
+	at org.tizen.nativecommon.launch.TizenLaunchDelegate2.installPackage(TizenLaunchDelegate2.java:1208)
+	at org.tizen.nativecommon.launch.TizenLaunchDelegate2.normalDeploy(TizenLaunchDelegate2.java:1006)
+	at org.tizen.nativecommon.launch.TizenLaunchDelegate2.deployApplication(TizenLaunchDelegate2.java:928)
+	at org.tizen.nativecommon.launch.TizenLaunchDelegate2.launchApplicationForRun(TizenLaunchDelegate2.java:588)
+	at org.tizen.nativecommon.launch.TizenLaunchDelegate2.launch(TizenLaunchDelegate2.java:289)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:56)
+!SESSION 2021-02-08 17:47:27.593 -----------------------------------------------
+eclipse.buildId=4.1 
+java.version=1.8.0_242
+java.vendor=Amazon.com Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.core.resources 2 10035 2021-02-08 17:47:33.293
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY org.eclipse.ui 2 0 2021-02-08 17:47:35.356
+!MESSAGE Warnings while parsing the images from the 'org.eclipse.ui.commandImages' extension point.
+!SUBENTRY 1 org.eclipse.ui 2 0 2021-02-08 17:47:35.356
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.RepositoriesViewRefresh'
+!SUBENTRY 1 org.eclipse.ui 2 0 2021-02-08 17:47:35.356
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.org.eclipse.egit.ui.AbortRebase'
+!SUBENTRY 1 org.eclipse.ui 2 0 2021-02-08 17:47:35.356
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.history.RenameBranch'
+
+!ENTRY org.eclipse.egit.ui 2 0 2021-02-08 17:47:45.906
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Donghan Park'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.tizen.common.ui.Startup 1 0 2021-02-08 17:47:46.552
+!MESSAGE SDK Information: Path [C:\tizen-studio], Data Path [C:\tizen-studio-data], Platform Path [C:\tizen-studio\platforms\tizen-6.0\wearable]

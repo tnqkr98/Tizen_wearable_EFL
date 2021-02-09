@@ -5,8 +5,8 @@
 Evas_Object *GLOBAL_DEBUG_BOX;
 Evas_Object *conform;
 Evas_Object *start, *stop;
-Evas_Object *hrm_label, *acc_label;
-sensor_listener_h listener_hrm, listener_acc;
+Evas_Object *hrm_label, *acc_label, *ir_label;
+sensor_listener_h listener_hrm, listener_acc, listener_ir;
 
 /*------------------------------------------------------- 센싱 콜백 세팅 ---------------------------------------------------- */
 void on_sensor_event(sensor_h sensor, sensor_event_s *event, void *user_data){
@@ -26,6 +26,12 @@ void on_sensor_event(sensor_h sensor, sensor_event_s *event, void *user_data){
 			sprintf(b,"x: %.1f y: %.1f z: %.1f",event->values[0],event->values[1],event->values[2]);
 			elm_object_text_set(acc_label,b);
 			break;
+		case SENSOR_HRM_LED_GREEN:
+			dlog_print(DLOG_INFO, LOG_TAG, "HRM GREEN LED : %d ", (int)(event->values[0]));
+			char c[100];
+			sprintf(c,"green : %d",(int)(event->values[0]));
+			elm_object_text_set(ir_label,c);
+			break;
 		default:
 			dlog_print(DLOG_ERROR, LOG_TAG, "Not an HRM event");
 	}
@@ -41,18 +47,24 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 
 	// Retrieving a Sensor		 센서가 있는지 확인  ------------------------------------------------------
 	sensor_type_e type = SENSOR_HRM;
-	sensor_h sensor, sensor_acc;
+	sensor_h sensor, sensor_acc, sensor_ir;
 
 	bool supported;
 	int error;
 
-	sensor_is_supported(SENSOR_HRM, &supported);
-	if(!supported){return;}		// 심박수 지원 X
+	sensor_is_supported(SENSOR_HRM, &supported);  // 심박수 지원? 
+	if(!supported){return;}		
 
-	sensor_is_supported(SENSOR_ACCELEROMETER, &supported);
-	if(!supported){return;}		// 가속도 지원 X
+	sensor_is_supported(SENSOR_ACCELEROMETER, &supported);  // 가속도 지원?
+	if(!supported){return;}		
 
-	//Get sensor list ? 왜 ? 한 보드에 HRM 센서가 여러개? 있을수있는 건가? (red, green 빛기반?) ----------------
+	sensor_is_supported(SENSOR_HRM_LED_GREEN, &supported);  // HRM IR 지원?
+	if(!supported){
+		dlog_print(DLOG_INFO, LOG_TAG, "IR XXXXXX ");
+		return;}		
+
+
+	//Get sensor list ( 디바이스 지원 센서 리스트 확인 ) ----------------
 	int count;
 	sensor_h *list;
 	error = sensor_get_sensor_list(SENSOR_HRM, &list, &count);
@@ -71,7 +83,10 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_get_default_sensor");	
 
 	sensor_get_default_sensor(SENSOR_ACCELEROMETER, &sensor_acc);	// 가속도 센서 참조획득
-	sensor_create_listener(sensor_acc, &listener_acc);		// 가속도 센서 리스너등록
+	sensor_create_listener(sensor_acc, &listener_acc);				// 가속도 센서 리스너등록
+
+	sensor_get_default_sensor(SENSOR_HRM_LED_GREEN, &sensor_ir);		// 심박수IR 센서 참조획득
+	sensor_create_listener(sensor_ir, &listener_ir);				// 심박수IR 센서 리스너등록
 
 	// 센서 리스너 등록, min_interval 값 획득  --------------------------------------------------------------------------------
 	error = sensor_create_listener(sensor, &listener_hrm);
@@ -96,8 +111,8 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 		return;
 	}
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_set_event_cb");
-	sensor_listener_set_event_cb(listener_acc, min_interval, on_sensor_event, user_data);
-
+	sensor_listener_set_event_cb(listener_acc, min_interval, on_sensor_event, user_data);	// 가속도
+	sensor_listener_set_event_cb(listener_ir, min_interval, on_sensor_event, user_data);	// 심박수IR
 
 	// 리스너에 Accuracy Changed 콜백 등록
 	error = sensor_listener_set_accuracy_cb(listener_hrm, _sensor_accuracy_changed_cb, user_data);
@@ -114,8 +129,8 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 		return;
 	}
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_set_interval");
-	sensor_listener_set_interval(listener_acc,200);
-
+	sensor_listener_set_interval(listener_acc,200);	// 가속도
+	sensor_listener_set_interval(listener_ir,10);	// 심박수IR
 
 	// 리스너에 option 지정
 	error = sensor_listener_set_option(listener_hrm,SENSOR_OPTION_ALWAYS_ON);
@@ -132,7 +147,8 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 		return;
 	}
 	dlog_print(DLOG_DEBUG, LOG_TAG, "sensor_listener_start");
-	sensor_listener_start(listener_acc);
+	sensor_listener_start(listener_acc);	// 가속도
+	sensor_listener_start(listener_ir);		// 심박수IR
 
 	// 센싱
 	sensor_event_s event;
@@ -141,7 +157,8 @@ void _sensor_start_cb(void *data, Evas_Object *obj, void *event_info){
 		dlog_print(DLOG_DEBUG,LOG_TAG,"sensor_listener_read_data error : %d",error);
 		return;
 	}
-	sensor_listener_read_data(listener_acc, &event);
+	sensor_listener_read_data(listener_acc, &event);	// 가속도
+	sensor_listener_read_data(listener_ir, &event);		// 심박수IR
 
 	// 센싱 데이터
 	/*switch(type_hrm){
@@ -239,12 +256,14 @@ void _sensor_stop_cb(void *data, Evas_Object *obj, void *event_info)
         dlog_print(DLOG_ERROR, LOG_TAG, "sensor_listener_stop error: %d", error);
     }
 	sensor_listener_stop(listener_acc);
+	sensor_listener_stop(listener_ir);
 
     error = sensor_destroy_listener(listener_hrm);
     if (error != SENSOR_ERROR_NONE) {
         dlog_print(DLOG_ERROR, LOG_TAG, "sensor_destroy_listener error: %d", error);
     }
 	sensor_destroy_listener(listener_acc);
+	sensor_destroy_listener(listener_ir);
 
     elm_object_disabled_set(start, EINA_FALSE);
     elm_object_disabled_set(stop, EINA_TRUE);
@@ -289,12 +308,17 @@ void _create_new_cd_display(appdata_s *ad, char *name, void *cb){
     start = _new_button(ad, box, "Start", _sensor_start_cb);
 
     hrm_label = elm_label_add(box);
-    elm_object_text_set(hrm_label, "NYX HRM!");
+    elm_object_text_set(hrm_label, "Heart Rate");
     elm_box_pack_end(box, hrm_label);
     evas_object_show(hrm_label);
 
+	ir_label = elm_label_add(box);
+	elm_object_text_set(ir_label, "HR Green LED");
+    elm_box_pack_end(box, ir_label);
+    evas_object_show(ir_label);
+
 	acc_label = elm_label_add(box);
-	elm_object_text_set(acc_label, "NYX ACC!");
+	elm_object_text_set(acc_label, "Accelerometer");
     elm_box_pack_end(box, acc_label);
     evas_object_show(acc_label);
 
